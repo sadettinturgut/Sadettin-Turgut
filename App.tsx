@@ -1,11 +1,12 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ImageUploader } from './components/ImageUploader';
 import { PromptDisplay } from './components/PromptDisplay';
 import { SparklesIcon } from './components/icons/SparklesIcon';
 import { generatePromptFromImage } from './services/geminiService';
 import { fileToBase64 } from './utils/fileUtils';
+import { SavedPromptsList } from './components/SavedPromptsList';
 
 const App: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -13,6 +14,30 @@ const App: React.FC = () => {
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedPrompts, setSavedPrompts] = useState<string[]>([]);
+
+  // Load saved prompts from localStorage on initial render
+  useEffect(() => {
+    try {
+      const storedPrompts = localStorage.getItem('savedPrompts');
+      if (storedPrompts) {
+        setSavedPrompts(JSON.parse(storedPrompts));
+      }
+    } catch (err) {
+      console.error("Failed to load prompts from localStorage", err);
+      setSavedPrompts([]);
+    }
+  }, []);
+
+  // Save prompts to localStorage whenever the state changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('savedPrompts', JSON.stringify(savedPrompts));
+    } catch (err) {
+      console.error("Failed to save prompts to localStorage", err);
+    }
+  }, [savedPrompts]);
+
 
   const handleImageSelect = (file: File) => {
     setImageFile(file);
@@ -48,6 +73,24 @@ const App: React.FC = () => {
     }
   }, [imageFile]);
 
+  const handleSavePrompt = useCallback(() => {
+    if (generatedPrompt && !savedPrompts.includes(generatedPrompt)) {
+      setSavedPrompts(prevPrompts => [generatedPrompt, ...prevPrompts]);
+    }
+  }, [generatedPrompt, savedPrompts]);
+
+  const handleDeletePrompt = useCallback((indexToDelete: number) => {
+    setSavedPrompts(prevPrompts => prevPrompts.filter((_, index) => index !== indexToDelete));
+  }, []);
+  
+  const handleUsePrompt = useCallback((promptToUse: string) => {
+    setGeneratedPrompt(promptToUse);
+    setImageFile(null);
+    setPreviewUrl(null);
+    setError(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col items-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-4xl mx-auto">
@@ -82,10 +125,21 @@ const App: React.FC = () => {
 
           <div className="bg-gray-800 rounded-xl shadow-2xl p-6">
             <h2 className="text-xl font-semibold text-gray-200 mb-4">Oluşturulan Prompt</h2>
-            <PromptDisplay prompt={generatedPrompt} isLoading={isLoading} />
+            <PromptDisplay 
+              prompt={generatedPrompt} 
+              isLoading={isLoading} 
+              onSave={handleSavePrompt}
+              isSaved={savedPrompts.includes(generatedPrompt)}
+            />
           </div>
         </main>
         
+        <SavedPromptsList 
+          prompts={savedPrompts}
+          onUse={handleUsePrompt}
+          onDelete={handleDeletePrompt}
+        />
+
         <footer className="text-center text-gray-500 mt-12 text-sm">
             <p>Gemini AI ile güçlendirilmiştir.</p>
         </footer>

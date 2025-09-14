@@ -2,13 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { CopyIcon } from './icons/CopyIcon';
 import { Loader } from './Loader';
+import { BookmarkIcon } from './icons/BookmarkIcon';
 
 interface PromptDisplayProps {
   prompt: string;
   isLoading: boolean;
+  onSave: () => void;
+  isSaved: boolean;
 }
 
-export const PromptDisplay: React.FC<PromptDisplayProps> = ({ prompt, isLoading }) => {
+export const PromptDisplay: React.FC<PromptDisplayProps> = ({ prompt, isLoading, onSave, isSaved }) => {
   const [copied, setCopied] = useState(false);
   const [displayedPrompt, setDisplayedPrompt] = useState('');
 
@@ -24,6 +27,8 @@ export const PromptDisplay: React.FC<PromptDisplayProps> = ({ prompt, isLoading 
         }
       }, 10); // Adjust speed of typing effect
       return () => clearInterval(interval);
+    } else if (isLoading) {
+      setDisplayedPrompt('');
     }
   }, [prompt, isLoading]);
 
@@ -44,13 +49,23 @@ export const PromptDisplay: React.FC<PromptDisplayProps> = ({ prompt, isLoading 
       ) : displayedPrompt ? (
         <>
           <p className="text-gray-300 whitespace-pre-wrap font-mono text-sm leading-relaxed">{displayedPrompt}</p>
-          <button
-            onClick={handleCopy}
-            className="absolute top-3 right-3 p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-colors"
-            title="Prompt'u kopyala"
-          >
-            <CopyIcon className={`w-5 h-5 ${copied ? 'text-green-400' : 'text-gray-400'}`} />
-          </button>
+          <div className="absolute top-3 right-3 flex items-center gap-2">
+            <button
+              onClick={onSave}
+              disabled={isSaved}
+              className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title={isSaved ? "Prompt kaydedildi" : "Prompt'u kaydet"}
+            >
+              <BookmarkIcon className={`w-5 h-5 transition-colors ${isSaved ? 'text-indigo-400 fill-indigo-400/50' : 'text-gray-400'}`} />
+            </button>
+            <button
+              onClick={handleCopy}
+              className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-colors"
+              title="Prompt'u kopyala"
+            >
+              <CopyIcon className={`w-5 h-5 transition-colors ${copied ? 'text-green-400' : 'text-gray-400'}`} />
+            </button>
+          </div>
         </>
       ) : (
         <div className="flex items-center justify-center h-full">
