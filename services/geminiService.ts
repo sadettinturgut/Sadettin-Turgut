@@ -1,11 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Ensure the API key is available from environment variables.
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable not set.");
+// API Anahtarı, masaüstü uygulaması olarak kişisel kullanım için doğrudan koda eklenmiştir.
+// ÖNEMLİ: Bu kodu başkalarıyla paylaşırsanız API anahtarınız risk altında olabilir.
+const apiKey = "AIzaSyBfOrF0MnfGuK3hfzlauGoTESWNk25dHas";
+
+if (!apiKey) {
+  throw new Error("API anahtarı kod içinde ayarlanmamış.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: apiKey });
+
 
 /**
  * Generates a descriptive prompt for a given image using the Gemini API.
