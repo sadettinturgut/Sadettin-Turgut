@@ -1,0 +1,97 @@
+
+import React, { useState, useCallback } from 'react';
+import { Header } from './components/Header';
+import { ImageUploader } from './components/ImageUploader';
+import { PromptDisplay } from './components/PromptDisplay';
+import { SparklesIcon } from './components/icons/SparklesIcon';
+import { generatePromptFromImage } from './services/geminiService';
+import { fileToBase64 } from './utils/fileUtils';
+
+const App: React.FC = () => {
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleImageSelect = (file: File) => {
+    setImageFile(file);
+    setGeneratedPrompt('');
+    setError(null);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const handleGeneratePrompt = useCallback(async () => {
+    if (!imageFile) {
+      setError('Lütfen önce bir resim seçin.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    setGeneratedPrompt('');
+
+    try {
+      const { base64, mimeType } = await fileToBase64(imageFile);
+      const prompt = await generatePromptFromImage(base64, mimeType);
+      setGeneratedPrompt(prompt);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
+      setError(`Prompt oluşturulurken bir hata oluştu: ${errorMessage}`);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [imageFile]);
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col items-center p-4 sm:p-6 lg:p-8">
+      <div className="w-full max-w-4xl mx-auto">
+        <Header />
+
+        <main className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="flex flex-col space-y-6">
+            <ImageUploader onImageSelect={handleImageSelect} previewUrl={previewUrl} />
+            
+            <button
+              onClick={handleGeneratePrompt}
+              disabled={!imageFile || isLoading}
+              className="flex items-center justify-center w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-900 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-lg"
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Oluşturuluyor...
+                </>
+              ) : (
+                <>
+                  <SparklesIcon className="w-6 h-6 mr-2" />
+                  Prompt Oluştur
+                </>
+              )}
+            </button>
+            {error && <p className="text-red-400 text-center text-sm mt-2">{error}</p>}
+          </div>
+
+          <div className="bg-gray-800 rounded-xl shadow-2xl p-6">
+            <h2 className="text-xl font-semibold text-gray-200 mb-4">Oluşturulan Prompt</h2>
+            <PromptDisplay prompt={generatedPrompt} isLoading={isLoading} />
+          </div>
+        </main>
+        
+        <footer className="text-center text-gray-500 mt-12 text-sm">
+            <p>Gemini AI ile güçlendirilmiştir.</p>
+        </footer>
+      </div>
+    </div>
+  );
+};
+
+export default App;

@@ -1,0 +1,5 @@
+{
+  "name": "Copy of AI Görüntü Prompt Üretici",
+  "description": "Bu uygulama, yüklediğiniz görselleri analiz ederek onlar için yaratıcı ve ayrıntılı metin istemleri (prompt) oluşturmak üzere Gemini AI'yi kullanır. Yüklenen bir görüntüden ilham alarak yeni AI sanatı yaratmak için mükemmeldir.",
+  "requestFramePermissions": []
+}
