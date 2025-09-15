@@ -1,0 +1,21 @@
+{
+  "short_name": "Prompt Üretici",
+  "name": "Görüntüden Prompt'a",
+  "description": "Bu uygulama, yüklediğiniz görselleri analiz ederek onlar için yaratıcı ve ayrıntılı metin istemleri (prompt) oluşturmak üzere Gemini AI'yi kullanır.",
+  "icons": [
+    {
+      "src": "/icon-192.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#4f46e5",
+  "background_color": "#1a202c"
+}
