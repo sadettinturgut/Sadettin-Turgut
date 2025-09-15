@@ -193,6 +193,7 @@ const App: React.FC = () => {
 
         <footer className="text-center text-gray-500 mt-12 text-sm">
             <p>Gemini AI ile güçlendirilmiştir.</p>
+            <p className="mt-1">Programı Tasarlayan: Sadettin Turgut</p>
         </footer>
       </div>
     </div>

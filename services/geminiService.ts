@@ -1,11 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 
-// API Anahtarı, masaüstü uygulaması olarak kişisel kullanım için doğrudan koda eklenmiştir.
-// ÖNEMLİ: Bu kodu başkalarıyla paylaşırsanız API anahtarınız risk altında olabilir.
-const apiKey = "AIzaSyBfOrF0MnfGuK3hfzlauGoTESWNk25dHas";
+// API Anahtarı, güvenlik nedeniyle doğrudan koda eklenmemelidir.
+// Bunun yerine, uygulamanın çalıştığı sunucu ortamından güvenli bir şekilde
+// alınması gereken bir ortam değişkeni (environment variable) kullanılmalıdır.
+// Bu kodun tarayıcıda çalışması için API çağrılarının bir backend servisi üzerinden yapılması gerekir.
+const apiKey = process.env.API_KEY;
 
 if (!apiKey) {
-  throw new Error("API anahtarı kod içinde ayarlanmamış.");
+  // Bu hata, sunucu ortamında API_KEY değişkeninin ayarlanmadığını gösterir.
+  // Tarayıcıda bu kod doğrudan çalıştırıldığında `process` tanımsız olacağı için
+  // de bu hata alınır. API çağrılarının bir backend servisi üzerinden yapılması gerekir.
+  throw new Error("Gemini API anahtarı (API_KEY) ortam değişkeni bulunamadı veya ayarlanmadı.");
 }
 
 const ai = new GoogleGenAI({ apiKey: apiKey });
@@ -45,6 +50,11 @@ export async function generatePromptFromImage(base64Image: string, mimeType: str
     return promptText.trim();
   } catch (error) {
     console.error("Error calling Gemini API:", error);
+    // Frontend'e daha anlaşılır bir hata mesajı gönderiyoruz.
+    // Gerçek hata detayı sunucu loglarında kalır.
+    if (error instanceof Error && error.message.includes("API anahtarı")) {
+        throw error;
+    }
     throw new Error("Yapay zeka ile iletişim kurarken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.");
   }
 }
