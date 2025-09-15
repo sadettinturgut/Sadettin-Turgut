@@ -1,0 +1,26 @@
+{
+  "name": "prompt-generator-backend",
+  "version": "1.0.0",
+  "description": "Backend service for the AI Image Prompt Generator to securely handle API calls.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "gemini",
+    "api",
+    "proxy"
+  ],
+  "author": "Sadettin Turgut",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

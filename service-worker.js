@@ -2,6 +2,7 @@ const CACHE_NAME = 'image-prompt-generator-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/dist/bundle.js', // Main application script
   '/manifest.json',
   '/icon-192.svg',
   '/icon-512.svg'
